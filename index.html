@@ -39,7 +39,8 @@ main{max-width:480px;margin:0 auto;padding:calc(34px + env(safe-area-inset-top))
 .envelope .flap{position:absolute;left:0;right:0;top:0;height:60%;background:#EFA9C4;clip-path:polygon(0 0,100% 0,50% 100%);border-radius:14px 14px 0 0;transform-origin:top;transition:transform .6s ease;z-index:2}
 .envelope .seal{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:var(--night);z-index:3;display:grid;place-items:center;transition:opacity .3s}
 .envelope .seal svg{width:24px;height:24px}
-.note{position:absolute;left:8%;right:8%;top:10%;bottom:10%;background:var(--paper);color:var(--ink);border-radius:10px;padding:18px 16px;display:flex;align-items:center;justify-content:center;font-family:"Fraunces",Georgia,serif;font-style:italic;font-size:1.08rem;line-height:1.35;transition:transform .6s ease .25s;z-index:1;overflow:auto}
+.note p{margin:0}.note small{display:block;margin-top:10px;font-family:"Nunito",sans-serif;font-style:normal;font-size:.8rem;color:#7A5C86}
+.note{position:absolute;left:6%;right:6%;top:8%;bottom:8%;background:var(--paper);color:var(--ink);border-radius:10px;padding:18px 16px;display:flex;align-items:center;justify-content:center;font-family:"Fraunces",Georgia,serif;font-style:italic;font-size:1.08rem;line-height:1.35;transition:transform .6s ease .25s;z-index:1;overflow:auto}
 .envelope.open .flap{transform:rotateX(180deg);z-index:0}
 .envelope.open .seal{opacity:0}
 .envelope.open .note{transform:translateY(-38%);z-index:4;box-shadow:0 12px 30px rgba(0,0,0,.25)}
@@ -102,29 +103,10 @@ const store = { get(k){ try{return localStorage.getItem(k);}catch(e){return null
 const PARA = store.get("n-para") || "";
 const INICIO = store.get("n-inicio") || "";
 
-/* Notas: cambia estas frases por las tuyas (una por día, van rotando) */
-const NOTAS = [
-  "Hoy también estoy pensando en ti, aunque haya 1.300 km en medio.",
-  "Cuenta atrás en marcha. Cada día que pasa es un día menos para abrazarte.",
-  "Si Amberes tuviera tu sonrisa, sería la mejor ciudad del mundo.",
-  "Me encanta cómo te ríes cuando intentas no reírte.",
-  "Guárdame un plan para cuando vuelva. Yo ya tengo unos cuantos para ti.",
-  "Eres mi persona favorita en cualquier ciudad.",
-  "Hoy toca café a distancia: tú en Madrid, yo aquí, pensando lo mismo.",
-  "Qué suerte haberte encontrado.",
-  "Cuando me cuesta el día, pienso en la próxima vez que te vea y se me pasa.",
-  "Te debo un paseo largo y una cena sin prisa.",
-  "La distancia es solo un número. El mío favorito es el de días que faltan.",
-  "Me haces mejor persona sin intentarlo.",
-  "Un día de estos iremos juntos a Gran Canaria y me lo enseñarás todo.",
-  "Pequeño recordatorio: eres increíble. Por si se te había olvidado.",
-  "Aunque esté lejos, sigo siendo tu fan número uno.",
-  "Me gustas hoy un poco más que ayer.",
-  "Ojalá pudiera teletransportarme cinco minutos. Solo para darte un abrazo.",
-  "Gracias por tener paciencia con la distancia. Merece la pena.",
-  "Cada vez que suena el móvil espero que seas tú.",
-  "Lo mejor de mi semana siempre tiene algo que ver contigo."
-];
+/* Notas y mensajes (codificados para que no se lean a simple vista en GitHub) */
+const dec = s => JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(s), c => c.charCodeAt(0))));
+const NOTAS = dec("W3sidCI6ICLigJzCv01lIHN1YmlzdGUgZWwgYWlyZSBhIDI0PyBDb24gbG8gZmVsaXogcXVlIGVzdG95IHlvIGVuIG1pIGlnbMO64oCdIiwgImYiOiAiVMO6LCA4IGRlIGp1bGlvLiBQcm9tZXRvIG5vIHZvbHZlciBhIHRvY2FyIGVsIGFpcmUuIn0sIHsidCI6ICLigJxTYWJlcyBxdWUgbm8gc8OpIHBsYW5jaGFyLiBFbiBlc3RhIHJlbGFjacOzbiBlc3TDoW4gaW52ZXJ0aWRvcyBsb3MgcGFwZWxlc+KAnSIsICJmIjogIlTDuiwgMzEgZGUgbWF5by4gWSBhc8OtIG5vcyB2YSBkZSBiaWVuLiJ9LCB7InQiOiAi4oCcQSBwYXJ0aXIgZGUgbWHDsWFuYSB2dWVsdm8gYSB0ZW5lciBhIG1pIGRlc21hcXVpbGxhZG9yIGZhdm9yaXRv4oCdIiwgImYiOiAiVMO6LCAyNyBkZSBqdWxpby4gU2lnbyBwZW5zYW5kbyBwb25lcmxvIGVuIGVsIENWLiJ9LCB7InQiOiAi4oCcTHVlZ28gbWUgZGljZXMgY3XDoW5kbyBxdWllcmVzIHF1ZSB2YXlhIGNvbiBlbCBjYXJydWFqZSBhIHBvciB0aSwgcHJpbmNlc2HigJ0iLCAiZiI6ICJZbywgMzEgZGUgbWF5by4gRWwgY2FycnVhamUgc2lndWUgZW4gZWwgdGFsbGVyLCBwZXJvIHZhLiJ9LCB7InQiOiAi4oCcQ3JlbyBxdWUgbGxlZ28gbmFkYW5kbyBhIEZ1ZXJ0ZXZlbnR1cmHigJ0iLCAiZiI6ICJZbywgMTcgZGUganVsaW8uIEEgTWFkcmlkIG5hZGFuZG8gbm8gbGxlZ28sIHBlcm8gZWwgOCBkZSBvY3R1YnJlIHPDrS4ifSwgeyJ0IjogIuKAnEEgdmVyIHNpIHRlbmdvIHN1ZXJ0ZSB5IGludmVudGFuIGVsIHRlbGV0cmFuc3BvcnRlIGVzdGUgYcOxb+KAnSIsICJmIjogIllvLCAyIGRlIGp1bmlvLiBTaWdvIGVzcGVyYW5kbyBub3RpY2lhcy4ifSwgeyJ0IjogIuKAnFRlIGxsZXZvIGEgdW4gZ3VhY2hpbmNoZeKAnSIsICJmIjogIlTDuiwgNiBkZSBqdWxpby4gVGUgbG8gcGllbnNvIGNvYnJhci4ifSwgeyJ0IjogIuKAnFkgdW4gbW9ubyBzZSBjb21pw7MgbWkgY29taWRhIHVuYSB2ZXrigJ0iLCAiZiI6ICJUw7osIDI1IGRlIGFnb3N0by4gTGEgbWVqb3IgYW7DqWNkb3RhIHF1ZSBtZSBoYW4gY29udGFkbyBudW5jYS4ifSwgeyJ0IjogIuKAnFBlbnNhYmEgcXVlIGxlIGliYW4gYSBzZWN1ZXN0cmFyIGVsIGF2acOzbiBvIGFsZ2/igJ0iLCAiZiI6ICJUw7osIDQgZGUgYWdvc3RvLiBTaWVtcHJlIHRhbiB0cmFucXVpbGEuIn0sIHsidCI6ICLigJxNYWRyaWQgcG9ycXVlIGVzdMOhcyB0w7ouIEdjIHBvcnF1ZSBlc3TDoSBtaSBmYW1pbGlh4oCdIiwgImYiOiAiVMO6LCAyMCBkZSBqdWxpby4gRXN0YSBtZSBsYSBndWFyZMOpLiJ9LCB7InQiOiAi4oCcMTAvMTAgZW4gbWkgdGVycmFjaXRhIGNvbWllbmRvIHV2YXMgZnJlc3F1aXRhc+KAnSIsICJmIjogIlTDuiwgMjUgZGUgbWF5by4gUGVuZGllbnRlOiByZXBldGlybG8ganVudG9zLiJ9LCB7InQiOiAi4oCcU2FiZXMgcXVlIGVzdG95IGxleWVuZG8gc29icmUgbGEgdGVvcsOtYSBkZSBsYSByZWxhdGl2aWRhZOKAnSIsICJmIjogIlTDuiwgNiBkZSBqdW5pby4gRWluc3RlaW4gZXN0YXLDrWEgb3JndWxsb3NvIChzaSBubyB0ZSBodWJpZXJhcyBkb3JtaWRvKS4ifSwgeyJ0IjogIuKAnE1lIHZveSBhIHZlciB1bmEgcGVsaSBkZSBhbW9yIGVuIGVsIGF2acOzbiBqaWpp4oCdIiwgImYiOiAiVMO6LCAzMSBkZSBhZ29zdG8uIExhIHByw7N4aW1hIGxhIHZlbW9zIGp1bnRvcy4ifSwgeyJ0IjogIuKAnFRlIGRveSB1biBiZXNvIGRlIGJ1ZW5vcyBkw61hcyB5IHR1IGZydXRpdGEgbWHDsWFuZXJh4oCdIiwgImYiOiAiWW8sIDEzIGRlIGp1bGlvLiBDdWVudGEgY29tbyBwcm9tZXNhLiJ9LCB7InQiOiAi4oCcTWHDsWFuYSB0ZSBoYWdvIGVsIGRlbGl2ZXJ54oCdIiwgImYiOiAiWW8sIDIzIGRlIGp1bmlvLiBTZXJ2aWNpbyBhIGRvbWljaWxpbyBnYXJhbnRpemFkbywgdGFtYmnDqW4gZGVzZGUgQW1iZXJlcy4ifSwgeyJ0IjogIuKAnFlhIG5vIHF1aWVybyBuYWRhLCBtaSBhbW9yLiBTb2xvIHF1ZSB0ZSBwdWVkYSB2ZXIgZGUgbnVldm/igJ0iLCAiZiI6ICJUw7osIDUgZGUgc2VwdGllbWJyZS4gWW8gdGFtcG9jby4ifSwgeyJ0IjogIuKAnEVyZXMgZWwgbWVqb3IgZGVsIG11bmRvIPCfmK3igJ0iLCAiZiI6ICJUw7osIDIyIGRlIGp1bmlvLiBMbyB0ZW5nbyBwb3IgZXNjcml0bywgbm8gaGF5IHZ1ZWx0YSBhdHLDoXMuIn0sIHsidCI6ICLigJxFcyBkaWbDrWNpbCB2aXZpciBsZWpvcyBkZSBhbGd1aWVuIGN1YW5kbyBsZSBhbWFzIHRhbnRv4oCdIiwgImYiOiAiWW8sIDE3IGRlIGFnb3N0by4gUGVybyBtZXJlY2UgbGEgcGVuYS4ifSwgeyJ0IjogIuKAnE9sZSBvbGUgb2xlZWVlZWVlZWVlZWVlZeKAnSIsICJmIjogIlTDuiwgNSBkZSBhZ29zdG8uIEFzw60gdGUgcXVpZXJvLCBjb24gZW5lcmfDrWEuIn0sIHsidCI6ICJIb3kgdGFtYmnDqW4gZXN0b3kgcGVuc2FuZG8gZW4gdGksIGF1bnF1ZSBoYXlhIG3DoXMgZGUgbWlsIGtpbMOzbWV0cm9zIGVuIG1lZGlvLiIsICJmIjogIlR1IG1pbGkg4pm+77iPIn0sIHsidCI6ICJTaSBBbWJlcmVzIHR1dmllcmEgdHUgc29ucmlzYSwgc2Vyw61hIGxhIG1lam9yIGNpdWRhZCBkZWwgbXVuZG8uIiwgImYiOiAiVHUgbWlsaSDimb7vuI8ifSwgeyJ0IjogIkNhZGEgZMOtYSBxdWUgcGFzYSBlcyB1biBkw61hIG1lbm9zIHBhcmEgYWJyYXphcnRlLiIsICJmIjogIlR1IG1pbGkg4pm+77iPIn0sIHsidCI6ICJFcmVzIG1pIHBlcnNvbmEgZmF2b3JpdGEgZW4gY3VhbHF1aWVyIGNpdWRhZC4iLCAiZiI6ICJUdSBtaWxpIOKZvu+4jyJ9LCB7InQiOiAiT2phbMOhIHB1ZGllcmEgdGVsZXRyYW5zcG9ydGFybWUgY2luY28gbWludXRvcy4gU29sbyBwYXJhIGRhcnRlIHVuIGJlc28uIiwgImYiOiAiVHUgbWlsaSDimb7vuI8ifV0=");
+const MENSAJES = dec("WyJNaWxpLCB0ZSBlY2hvIGRlIG1lbm9zIOKdpO+4jyIsICLCv0hhbiBpbnZlbnRhZG8geWEgZWwgdGVsZXRyYW5zcG9ydGU/IFBvcnF1ZSBsbyBuZWNlc2l0byIsICJRdWVkYW4ge2RpYXN9IGTDrWFzIHkgeWEgbWUgc29icmFuIHRvZG9zIiwgIlZlbiBjb24gZWwgY2FycnVhamUgeWEsIHByaW5jZXNhIGVzcGVyYW5kbyIsICJFY2hvIGRlIG1lbm9zIGEgbWkgZGVzbWFxdWlsbGFkb3IgZmF2b3JpdG8iLCAiTWUgZGViZXMgdW4gZ3VhY2hpbmNoZSB5IG11Y2hvcyBiZXNvcyIsICJOaSBzZSB0ZSBvY3VycmEgc3ViaXIgZWwgYWlyZSBhIDI0IGVuIEFtYmVyZXMiLCAiVGUgZWNobyBkZSBtZW5vcyBtw6FzIHF1ZSBlbCBtb25vIGEgbWkgY29taWRhIiwgIkxsZWdhIHlhLCBxdWUgbm8gc8OpIHBsYW5jaGFyIiwgIlRlIHF1aWVybywgZGVtb25pbyDimb7vuI8iLCAiTWFkcmlkIHNpbiB0aSBubyBlcyBsbyBtaXNtbyIsICJDdWVudGEgYXRyw6FzIGFjdGl2YWRhOiB7ZGlhc30gZMOtYXMgcGFyYSB2ZXJ0ZSJd");
 
 const $ = id => document.getElementById(id);
 const DAY = 864e5;
@@ -175,7 +157,10 @@ tick(); setInterval(tick, 1000);
 
 /* nota del día */
 const dayIndex = Math.floor(startOfDay(new Date()).getTime()/DAY);
-$("note").textContent = NOTAS[dayIndex % NOTAS.length];
+const nota = NOTAS[dayIndex % NOTAS.length];
+$("note").innerHTML = "<div><p></p><small></small></div>";
+$("note").querySelector("p").textContent = nota.t;
+$("note").querySelector("small").textContent = nota.f;
 const openedKey = "n-open-" + dayIndex;
 if (store.get(openedKey)) { $("env").classList.add("open"); $("envHint").textContent = "Mañana habrá otra."; }
 $("env").onclick = () => {
@@ -194,7 +179,11 @@ function burst(n){
 }
 $("kiss").onclick = () => {
   burst(22);
-  setTimeout(() => { location.href = "https://wa.me/?text=" + encodeURIComponent("Te echo de menos ♥"); }, 700);
+  setTimeout(() => { const v = visita(); const dias = v ? Math.max(0, Math.round((v - startOfDay(new Date()))/DAY)) : "pocos";
+    let pool = MENSAJES.filter(m => v || !m.includes("{dias}"));
+    const last = store.get("n-lastmsg"); if (pool.length > 1) pool = pool.filter(m => m !== last);
+    const msg = pool[Math.floor(Math.random()*pool.length)]; store.set("n-lastmsg", msg);
+    location.href = "https://wa.me/?text=" + encodeURIComponent(msg.replace("{dias}", dias)); }, 700);
 };
 </script>
 </body>
