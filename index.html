@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nosotros">
+<meta name="theme-color" content="#2A1B3D">
+<link rel="apple-touch-icon" href="icono.png">
+<link rel="icon" href="icono.png">
+<title>Nosotros</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--night:#2A1B3D;--deep:#1C1129;--lilac:#B9A7F0;--rose:#F7C6D9;--paper:#FFF7FA;--ink:#2A1B3D;--soft:rgba(255,255,255,.7)}
+*{box-sizing:border-box}html,body{margin:0}
+body{min-height:100vh;background:radial-gradient(120% 70% at 50% 0%,#3D2758 0%,var(--night) 55%,var(--deep) 100%);color:#fff;font-family:"Nunito",system-ui,-apple-system,sans-serif;line-height:1.45;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+main{max-width:480px;margin:0 auto;padding:calc(34px + env(safe-area-inset-top)) 22px calc(40px + env(safe-area-inset-bottom));text-align:center}
+.hi{font-family:"Fraunces",Georgia,serif;font-style:italic;font-size:1.25rem;color:var(--rose);margin:0}
+.big{font-family:"Fraunces",Georgia,serif;font-weight:800;font-size:clamp(5.5rem,30vw,8rem);line-height:.9;margin:10px 0 0;letter-spacing:-.03em}
+.label{font-size:1.1rem;margin:6px 0 0;color:var(--soft)}
+.clock{font-variant-numeric:tabular-nums;font-weight:700;color:var(--lilac);margin-top:4px}
+.setdate{margin-top:14px}
+.setdate input{font:inherit;padding:10px 12px;border-radius:12px;border:0;background:rgba(255,255,255,.12);color:#fff;min-height:44px;color-scheme:dark}
+.route{margin:34px 0 8px;display:flex;align-items:center;gap:10px;font-weight:700}
+.route span{flex:none}
+.route svg{flex:1;height:40px}
+.km{color:var(--soft);font-size:.92rem;margin:0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:30px}
+.stat{background:rgba(255,255,255,.07);border-radius:18px;padding:16px 10px}
+.stat b{display:block;font-family:"Fraunces",Georgia,serif;font-size:2.1rem;line-height:1}
+.stat small{color:var(--soft)}
+.envelope-wrap{margin-top:38px}
+.envelope-wrap h2{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:1.3rem;margin:0 0 14px}
+.envelope{position:relative;width:100%;max-width:340px;margin:0 auto;aspect-ratio:3/2;border:0;padding:0;background:none;cursor:pointer;perspective:800px}
+.envelope .body{position:absolute;inset:0;background:var(--rose);border-radius:14px}
+.envelope .flap{position:absolute;left:0;right:0;top:0;height:60%;background:#EFA9C4;clip-path:polygon(0 0,100% 0,50% 100%);border-radius:14px 14px 0 0;transform-origin:top;transition:transform .6s ease;z-index:2}
+.envelope .seal{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:var(--night);z-index:3;display:grid;place-items:center;transition:opacity .3s}
+.envelope .seal svg{width:24px;height:24px}
+.note{position:absolute;left:8%;right:8%;top:10%;bottom:10%;background:var(--paper);color:var(--ink);border-radius:10px;padding:18px 16px;display:flex;align-items:center;justify-content:center;font-family:"Fraunces",Georgia,serif;font-style:italic;font-size:1.08rem;line-height:1.35;transition:transform .6s ease .25s;z-index:1;overflow:auto}
+.envelope.open .flap{transform:rotateX(180deg);z-index:0}
+.envelope.open .seal{opacity:0}
+.envelope.open .note{transform:translateY(-38%);z-index:4;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.envelope.open{margin-bottom:60px}
+.hint{color:var(--soft);font-size:.88rem;margin-top:12px}
+.kiss{margin-top:34px;font:inherit;font-weight:700;font-size:1.05rem;border:0;border-radius:999px;padding:15px 26px;min-height:52px;background:var(--lilac);color:var(--night);cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--rose);outline-offset:3px}
+.hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:10}
+.hearts i{position:absolute;bottom:-40px;font-style:normal;color:var(--rose);animation:up 2.4s ease-in forwards}
+@keyframes up{to{transform:translateY(-110vh) rotate(20deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){.envelope .flap,.note{transition:none}.hearts{display:none}}
+</style>
+</head>
+<body>
+<main>
+  <p class="hi" id="hi">Hola</p>
+  <div id="countBox">
+    <div class="big" id="days">–</div>
+    <p class="label" id="daysLabel">días para vernos</p>
+    <div class="clock" id="clock"></div>
+  </div>
+  <div class="setdate" id="setdate" hidden>
+    <p class="label">¿Cuándo nos vemos?</p>
+    <input type="date" id="dateInput" aria-label="Fecha del próximo encuentro">
+  </div>
+
+  <div class="route" aria-hidden="true">
+    <span>Madrid</span>
+    <svg viewBox="0 0 200 40" preserveAspectRatio="none"><path d="M4 30 Q100 -10 196 30" fill="none" stroke="#B9A7F0" stroke-width="2" stroke-dasharray="5 6"/><path d="M100 4 l-5 -4 a3 3 0 0 0 -5 3 l10 9 10 -9 a3 3 0 0 0 -5 -3z" fill="#F7C6D9" transform="translate(0 6)"/></svg>
+    <span>Amberes</span>
+  </div>
+  <p class="km" id="km"></p>
+
+  <div class="stats" id="stats" hidden>
+    <div class="stat"><b id="together">0</b><small>días juntos</small></div>
+    <div class="stat"><b id="mesi">0</b><small id="mesiLabel">días para el mesiversario</small></div>
+  </div>
+
+  <section class="envelope-wrap">
+    <h2>La nota de hoy</h2>
+    <button class="envelope" id="env" aria-label="Abrir la nota de hoy">
+      <div class="note" id="note"></div>
+      <div class="body"></div>
+      <div class="flap"></div>
+      <div class="seal"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3.3 5 6.8 5c2 0 3.5 1.1 5.2 3 1.7-1.9 3.2-3 5.2-3 3.5 0 5.6 3.6 4.3 6.8C19.5 16.4 12 21 12 21z" fill="#F7C6D9"/></svg></div>
+    </button>
+    <p class="hint" id="envHint">Toca el sobre. Cada día hay una nota nueva.</p>
+  </section>
+
+  <button class="kiss" id="kiss">Te echo de menos</button>
+</main>
+<div class="hearts" id="hearts"></div>
+
+<script>
+/* Personaliza con el enlace, así nada privado queda en el código público:
+   index.html?para=Nombre&inicio=2026-07-05&visita=2026-10-10          */
+const q = new URLSearchParams(location.search);
+const store = { get(k){ try{return localStorage.getItem(k);}catch(e){return null;} }, set(k,v){ try{localStorage.setItem(k,v);}catch(e){} } };
+["para","inicio","visita"].forEach(k => { if (q.get(k)) store.set("n-"+k, q.get(k)); });
+const PARA = store.get("n-para") || "";
+const INICIO = store.get("n-inicio") || "";
+
+/* Notas: cambia estas frases por las tuyas (una por día, van rotando) */
+const NOTAS = [
+  "Hoy también estoy pensando en ti, aunque haya 1.300 km en medio.",
+  "Cuenta atrás en marcha. Cada día que pasa es un día menos para abrazarte.",
+  "Si Amberes tuviera tu sonrisa, sería la mejor ciudad del mundo.",
+  "Me encanta cómo te ríes cuando intentas no reírte.",
+  "Guárdame un plan para cuando vuelva. Yo ya tengo unos cuantos para ti.",
+  "Eres mi persona favorita en cualquier ciudad.",
+  "Hoy toca café a distancia: tú en Madrid, yo aquí, pensando lo mismo.",
+  "Qué suerte haberte encontrado.",
+  "Cuando me cuesta el día, pienso en la próxima vez que te vea y se me pasa.",
+  "Te debo un paseo largo y una cena sin prisa.",
+  "La distancia es solo un número. El mío favorito es el de días que faltan.",
+  "Me haces mejor persona sin intentarlo.",
+  "Un día de estos iremos juntos a Gran Canaria y me lo enseñarás todo.",
+  "Pequeño recordatorio: eres increíble. Por si se te había olvidado.",
+  "Aunque esté lejos, sigo siendo tu fan número uno.",
+  "Me gustas hoy un poco más que ayer.",
+  "Ojalá pudiera teletransportarme cinco minutos. Solo para darte un abrazo.",
+  "Gracias por tener paciencia con la distancia. Merece la pena.",
+  "Cada vez que suena el móvil espero que seas tú.",
+  "Lo mejor de mi semana siempre tiene algo que ver contigo."
+];
+
+const $ = id => document.getElementById(id);
+const DAY = 864e5;
+const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const parse = s => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s||""); return m ? new Date(+m[1], +m[2]-1, +m[3]) : null; };
+
+$("hi").textContent = PARA ? `Hola, ${PARA}` : "Hola";
+
+/* distancia Madrid–Amberes */
+(function(){
+  const R=6371, rad=x=>x*Math.PI/180, a=[40.4168,-3.7038], b=[51.2194,4.4025];
+  const h=Math.sin(rad(b[0]-a[0])/2)**2+Math.cos(rad(a[0]))*Math.cos(rad(b[0]))*Math.sin(rad(b[1]-a[1])/2)**2;
+  const km=Math.round(2*R*Math.asin(Math.sqrt(h)));
+  $("km").textContent = `${km.toLocaleString("es-ES")} km en línea recta. Por poco tiempo.`;
+})();
+
+/* cuenta atrás */
+function visita(){ return parse(store.get("n-visita")); }
+function tick(){
+  const v = visita(), now = new Date();
+  if (!v || v < startOfDay(now)){ $("countBox").hidden = true; $("setdate").hidden = false; return; }
+  $("countBox").hidden = false; $("setdate").hidden = true;
+  const days = Math.round((v - startOfDay(now)) / DAY);
+  if (days === 0){ $("days").textContent = "¡Hoy!"; $("daysLabel").textContent = "nos vemos"; $("clock").textContent = ""; return; }
+  $("days").textContent = days;
+  $("daysLabel").textContent = days === 1 ? "día para vernos" : "días para vernos";
+  const ms = v - now, hh = Math.floor(ms/36e5), mm = Math.floor(ms%36e5/6e4), ss = Math.floor(ms%6e4/1e3);
+  $("clock").textContent = `${hh} h ${String(mm).padStart(2,"0")} min ${String(ss).padStart(2,"0")} s`;
+}
+$("dateInput").min = new Date().toISOString().slice(0,10);
+$("dateInput").onchange = e => { store.set("n-visita", e.target.value); tick(); };
+$("days").onclick = () => { $("setdate").hidden = !$("setdate").hidden; };
+tick(); setInterval(tick, 1000);
+
+/* días juntos y mesiversario */
+(function(){
+  const ini = parse(INICIO); if (!ini) return;
+  const today = startOfDay(new Date());
+  $("stats").hidden = false;
+  $("together").textContent = Math.max(0, Math.round((today - ini)/DAY)).toLocaleString("es-ES");
+  const md = (y,m) => new Date(y, m, Math.min(ini.getDate(), new Date(y, m+1, 0).getDate()));
+  let next = md(today.getFullYear(), today.getMonth());
+  if (next < today) next = md(today.getFullYear(), today.getMonth()+1);
+  const d = Math.round((next - today)/DAY);
+  $("mesi").textContent = d === 0 ? "¡Hoy!" : d;
+  $("mesiLabel").textContent = d === 0 ? "es nuestro mesiversario" : d === 1 ? "día para el mesiversario" : "días para el mesiversario";
+})();
+
+/* nota del día */
+const dayIndex = Math.floor(startOfDay(new Date()).getTime()/DAY);
+$("note").textContent = NOTAS[dayIndex % NOTAS.length];
+const openedKey = "n-open-" + dayIndex;
+if (store.get(openedKey)) { $("env").classList.add("open"); $("envHint").textContent = "Mañana habrá otra."; }
+$("env").onclick = () => {
+  const env = $("env"); if (env.classList.contains("open")) return;
+  env.classList.add("open"); store.set(openedKey,"1"); $("envHint").textContent = "Mañana habrá otra."; burst(14);
+};
+
+/* corazones */
+function burst(n){
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  for (let i=0;i<n;i++){
+    const h=document.createElement("i"); h.textContent="♥";
+    h.style.left=Math.random()*100+"vw"; h.style.fontSize=(16+Math.random()*26)+"px"; h.style.animationDelay=(Math.random()*.6)+"s";
+    $("hearts").appendChild(h); setTimeout(()=>h.remove(),3200);
+  }
+}
+$("kiss").onclick = () => {
+  burst(22);
+  setTimeout(() => { location.href = "https://wa.me/?text=" + encodeURIComponent("Te echo de menos ♥"); }, 700);
+};
+</script>
+</body>
+</html>
