@@ -172,7 +172,7 @@ showNote(NOTAS[dayIndex % NOTAS.length]);   // nota por defecto
       const parts = line.split("|").map(s=>s.trim());
       let f = parts[0]; const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(f);
       if (m) f = m[3]+"-"+m[2].padStart(2,"0")+"-"+m[1].padStart(2,"0");
-      if (f === iso && parts[1]) { showNote({t: parts[1], f: parts[2] || "Tu mili ♾️"}); break; }
+      if (f === iso && parts[1]) { showNote({t: parts[1], f: parts[2] || ""}); break; }
     }
   }catch(e){}
 })();
