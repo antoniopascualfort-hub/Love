@@ -1,0 +1,11 @@
+# NOTAS PARA CADA DÍA
+# Escribe una línea por día así:   FECHA | TEXTO | FIRMA
+# - La fecha puede ser 20/09/2026 o 2026-09-20
+# - La firma es opcional: si no la pones, la nota sale sin firma
+# - Las líneas que empiezan por # no se muestran
+# - Los días sin nota aquí, sale una de las frases de vuestro chat
+#
+# Ojo: este archivo es público en GitHub, no pongas nada muy íntimo.
+
+20/09/2026 | Buenos días, princesa. Hoy solo quería que supieras que te quiero.
+22/09/2026 | ¡4 meses! Y cada uno mejor que el anterior. Te amo ❤️♾️
