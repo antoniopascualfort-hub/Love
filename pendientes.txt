@@ -1,0 +1,8 @@
+# PLANES QUE LE DEBO
+# Una línea por plan:   [ ] PLAN | DETALLE
+# - Cuando lo cumpláis, cambia [ ] por [x] y saldrá tachado como "¡Cumplido!"
+# - El detalle (después de |) es opcional
+# - Las líneas que empiezan por # no se muestran
+
+[ ] Una cena en el rooftop Makáá | Madrid
+[ ] Un finde en el Noctis Hotel | Soria

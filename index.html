@@ -5,11 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Nosotros">
+<meta name="apple-mobile-web-app-title" content="Love">
 <meta name="theme-color" content="#2A1B3D">
 <link rel="apple-touch-icon" href="icono.png">
 <link rel="icon" href="icono.png">
-<title>Nosotros</title>
+<title>Love</title>
+<meta property="og:title" content="Love">
+<meta property="og:description" content="♥">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
@@ -49,6 +51,18 @@ main{max-width:480px;margin:0 auto;padding:calc(34px + env(safe-area-inset-top))
 .hint{color:var(--soft);font-size:.88rem;margin-top:12px}
 .kiss{margin-top:34px;font:inherit;font-weight:700;font-size:1.05rem;border:0;border-radius:999px;padding:15px 26px;min-height:52px;background:var(--lilac);color:var(--night);cursor:pointer}
 button:focus-visible,input:focus-visible{outline:3px solid var(--rose);outline-offset:3px}
+.debo{margin-top:40px;text-align:left}
+.debo h2{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:1.3rem;margin:0 0 4px;text-align:center}
+.debo>p{color:var(--soft);font-size:.9rem;margin:0 0 14px;text-align:center}
+.vale{position:relative;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;background:var(--paper);color:var(--ink);border-radius:14px;padding:16px 18px 16px 16px;margin-top:12px}
+.vale::before,.vale::after{content:"";position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--night);transform:translateY(-50%)}
+.vale::before{left:-9px}.vale::after{right:-9px}
+.vale .ico{width:44px;height:44px;border-radius:50%;background:var(--rose);display:grid;place-items:center;font-size:1.3rem;border-right:0}
+.vale small{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#7A5C86;font-weight:700}
+.vale b{display:block;font-family:"Fraunces",Georgia,serif;font-size:1.12rem;line-height:1.2}
+.vale span{display:block;color:#6B5A75;font-size:.88rem;margin-top:2px}
+.vale.done{opacity:.6}
+.vale.done b{text-decoration:line-through}
 .hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:10}
 .hearts i{position:absolute;bottom:-40px;font-style:normal;color:var(--rose);animation:up 2.4s ease-in forwards}
 @keyframes up{to{transform:translateY(-110vh) rotate(20deg);opacity:0}}
@@ -88,6 +102,12 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--rose);outline-o
       <div class="seal"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3.3 5 6.8 5c2 0 3.5 1.1 5.2 3 1.7-1.9 3.2-3 5.2-3 3.5 0 5.6 3.6 4.3 6.8C19.5 16.4 12 21 12 21z" fill="#F7C6D9"/></svg></div>
     </button>
     <p class="hint" id="envHint">Toca el sobre. Cada día hay una nota nueva.</p>
+  </section>
+
+  <section class="debo">
+    <h2>Te debo…</h2>
+    <p>Planes pendientes que pienso cumplir</p>
+    <div id="vales"></div>
   </section>
 
   <button class="kiss" id="kiss">Te echo de menos</button>
@@ -182,6 +202,41 @@ $("env").onclick = () => {
   const env = $("env"); if (env.classList.contains("open")) return;
   env.classList.add("open"); store.set(openedKey,"1"); $("envHint").textContent = "Mañana habrá otra."; burst(14);
 };
+
+
+/* Planes que te debo: se leen de pendientes.txt (si no está, salen estos) */
+const VALES_DEF = [
+  {done:false, t:"Una cena en el rooftop Makáá", d:"Madrid"},
+  {done:false, t:"Un finde en el Noctis Hotel", d:"Soria"}
+];
+function renderVales(list){
+  const box = $("vales"); box.innerHTML = "";
+  list.forEach(v => {
+    const el = document.createElement("div");
+    el.className = "vale" + (v.done ? " done" : "");
+    el.innerHTML = '<div class="ico"></div><div><small></small><b></b><span></span></div>';
+    el.querySelector(".ico").textContent = v.done ? "✓" : "♥";
+    el.querySelector("small").textContent = v.done ? "¡Cumplido!" : "Vale por";
+    el.querySelector("b").textContent = v.t;
+    el.querySelector("span").textContent = v.d || "";
+    box.appendChild(el);
+  });
+}
+renderVales(VALES_DEF);
+(async function(){
+  try{
+    const r = await fetch("pendientes.txt?" + Date.now(), {cache:"no-store"});
+    if (!r.ok) return;
+    const list = [];
+    for (const raw of (await r.text()).split(/\r?\n/)){
+      let line = raw.trim(); if (!line || line.startsWith("#")) continue;
+      const done = /^\[x\]/i.test(line); line = line.replace(/^\[[ x]?\]\s*/i, "");
+      const [t, d] = line.split("|").map(s=>s.trim());
+      if (t) list.push({done, t, d});
+    }
+    if (list.length) renderVales(list);
+  }catch(e){}
+})();
 
 /* corazones */
 function burst(n){
