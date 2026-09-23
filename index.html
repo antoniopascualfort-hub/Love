@@ -80,6 +80,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--rose);outline-o
   <div class="setdate" id="setdate" hidden>
     <p class="label">¿Cuándo nos vemos?</p>
     <input type="date" id="dateInput" aria-label="Fecha del próximo encuentro">
+    <button class="kiss" id="dateOk" style="margin-top:12px;padding:12px 22px;min-height:46px;font-size:.95rem">Listo</button>
   </div>
 
   <div class="route" aria-hidden="true">
@@ -145,10 +146,13 @@ $("hi").textContent = PARA ? `Hola, ${PARA}` : "Hola";
 
 /* cuenta atrás */
 function visita(){ return parse(store.get("n-visita")); }
+let editando = false;
 function tick(){
   const v = visita(), now = new Date();
   if (!v || v < startOfDay(now)){ $("countBox").hidden = true; $("setdate").hidden = false; return; }
-  $("countBox").hidden = false; $("setdate").hidden = true;
+  $("countBox").hidden = false;
+  if (editando) return;
+  $("setdate").hidden = true;
   const days = Math.round((v - startOfDay(now)) / DAY);
   if (days === 0){ $("days").textContent = "¡Hoy!"; $("daysLabel").textContent = "nos vemos"; $("clock").textContent = ""; return; }
   $("days").textContent = days;
@@ -157,8 +161,13 @@ function tick(){
   $("clock").textContent = `${hh} h ${String(mm).padStart(2,"0")} min ${String(ss).padStart(2,"0")} s`;
 }
 $("dateInput").min = new Date().toISOString().slice(0,10);
-$("dateInput").onchange = e => { store.set("n-visita", e.target.value); tick(); };
-$("days").onclick = () => { $("setdate").hidden = !$("setdate").hidden; };
+$("dateInput").onchange = e => { if (e.target.value) store.set("n-visita", e.target.value); tick(); };
+$("dateOk").onclick = () => { editando = false; $("setdate").hidden = true; tick(); };
+$("days").onclick = () => {
+  editando = !editando;
+  $("setdate").hidden = !editando;
+  if (editando){ const v = visita(); if (v) $("dateInput").value = v.toISOString().slice(0,10); }
+};
 tick(); setInterval(tick, 1000);
 
 /* meses de novios: el 22 de cada mes (1 mes = 22 de junio de 2026) */
