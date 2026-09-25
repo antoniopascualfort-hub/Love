@@ -120,7 +120,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--rose);outline-o
    index.html?para=Nombre&inicio=2026-07-05&visita=2026-10-10          */
 const q = new URLSearchParams(location.search);
 const store = { get(k){ try{return localStorage.getItem(k);}catch(e){return null;} }, set(k,v){ try{localStorage.setItem(k,v);}catch(e){} } };
-["para","inicio","visita"].forEach(k => { if (q.get(k)) store.set("n-"+k, q.get(k)); });
+["para","inicio","visita","hora"].forEach(k => { if (q.get(k)) store.set("n-"+k, q.get(k)); });
 const PARA = store.get("n-para") || "";
 const INICIO = store.get("n-inicio") || "";
 
@@ -146,18 +146,22 @@ $("hi").textContent = PARA ? `Hola, ${PARA}` : "Hola";
 
 /* cuenta atrás */
 function visita(){ return parse(store.get("n-visita")); }
+function horaVisita(){ const m = /^(\d{1,2}):(\d{2})$/.exec(store.get("n-hora")||""); return m ? [+m[1], +m[2]] : [0,0]; }
+function momento(){ const v = visita(); if (!v) return null; const [hh,mm] = horaVisita(); return new Date(v.getFullYear(), v.getMonth(), v.getDate(), hh, mm, 0); }
 let editando = false;
 function tick(){
-  const v = visita(), now = new Date();
-  if (!v || v < startOfDay(now)){ $("countBox").hidden = true; $("setdate").hidden = false; return; }
+  const v = visita(), m = momento(), now = new Date();
+  if (!v || m < now){ $("countBox").hidden = true; $("setdate").hidden = false; return; }
   $("countBox").hidden = false;
   if (editando) return;
   $("setdate").hidden = true;
   const days = Math.round((v - startOfDay(now)) / DAY);
-  if (days === 0){ $("days").textContent = "¡Hoy!"; $("daysLabel").textContent = "nos vemos"; $("clock").textContent = ""; return; }
-  $("days").textContent = days;
-  $("daysLabel").textContent = days === 1 ? "día para vernos" : "días para vernos";
-  const ms = v - now, hh = Math.floor(ms/36e5), mm = Math.floor(ms%36e5/6e4), ss = Math.floor(ms%6e4/1e3);
+  const ms = m - now, hh = Math.floor(ms/36e5), mm = Math.floor(ms%36e5/6e4), ss = Math.floor(ms%6e4/1e3);
+  if (days === 0){ $("days").textContent = "¡Hoy!"; $("daysLabel").textContent = "nos vemos"; }
+  else {
+    $("days").textContent = days;
+    $("daysLabel").textContent = days === 1 ? "día para vernos" : "días para vernos";
+  }
   $("clock").textContent = `${hh} h ${String(mm).padStart(2,"0")} min ${String(ss).padStart(2,"0")} s`;
 }
 $("dateInput").min = new Date().toISOString().slice(0,10);
